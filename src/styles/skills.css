@@ -1,0 +1,115 @@
+/* ============================================================================
+   Chapter 05 — The Skill Chamber
+   Scoped helpers for the skill tree, achievements and academic record.
+   ========================================================================== */
+
+/* Energy pulse travelling along active connector lines. */
+.skill-flow {
+  stroke-dasharray: 3 14;
+  animation: skill-flow 1.6s linear infinite;
+}
+@keyframes skill-flow {
+  to {
+    stroke-dashoffset: -34;
+  }
+}
+
+/* Slow holographic rotation of the core rings. Scroll adds an extra twist via --p. */
+.skill-core-ring {
+  transform: rotate(calc(var(--p, 0) * 220deg));
+  transition: transform 0.2s linear;
+}
+.skill-core-spin {
+  animation: skill-core-spin 24s linear infinite;
+}
+.skill-core-spin-rev {
+  animation: skill-core-spin 36s linear infinite reverse;
+}
+@keyframes skill-core-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Category node (desktop tree) and category chip (mobile row). */
+.skill-cat {
+  --cut: 8px;
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+  background: rgb(8 12 17 / 0.78);
+  box-shadow: inset 0 0 0 1px rgb(120 220 255 / 0.18);
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+}
+.skill-cat:hover {
+  background: rgb(18 26 35 / 0.9);
+  box-shadow: inset 0 0 0 1px rgb(34 225 255 / 0.45);
+}
+.skill-cat[aria-selected='true'] {
+  background: linear-gradient(90deg, rgb(34 225 255 / 0.18), rgb(59 130 255 / 0.1));
+  box-shadow:
+    inset 0 0 0 1px rgb(34 225 255 / 0.85),
+    inset 0 0 22px rgb(34 225 255 / 0.18);
+}
+/* Clip-path hides the default outline, so draw focus inside the shape. */
+.skill-cat:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 2px var(--color-cyan),
+    inset 0 0 0 4px rgb(3 4 6 / 0.9),
+    inset 0 0 22px rgb(34 225 255 / 0.25);
+}
+
+/* Skill node */
+.skill-node {
+  --cut: 7px;
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
+  background: linear-gradient(90deg, rgb(34 225 255 / 0.12), rgb(10 16 22 / 0.86) 45%);
+  box-shadow: inset 0 0 0 1px rgb(34 225 255 / 0.35);
+}
+
+/* Diamond port glyph */
+.skill-port {
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+  border: 1px solid var(--color-cyan);
+  background: rgb(3 4 6 / 0.9);
+  flex: none;
+}
+.skill-port[data-on='true'] {
+  background: var(--color-cyan);
+  box-shadow: 0 0 10px rgb(34 225 255 / 0.9);
+}
+
+/* Achievement unlock shine — swept across once by framer-motion on reveal. */
+.achv-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgb(255 176 46 / 0.22) 48%, rgb(255 255 255 / 0.12) 52%, transparent 70%);
+}
+
+.achv-badge {
+  clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+  background: radial-gradient(circle at 50% 35%, rgb(255 176 46 / 0.32), rgb(255 106 43 / 0.08) 70%);
+  box-shadow: inset 0 0 0 1px rgb(255 176 46 / 0.6);
+}
+
+/* Native <details> index — hide default marker. */
+.skill-index > summary {
+  list-style: none;
+}
+.skill-index > summary::-webkit-details-marker {
+  display: none;
+}
+.skill-index[open] .skill-index-chevron {
+  transform: rotate(180deg);
+}
+
+/* Thin horizontal scrollbar for the mobile category row. */
+.skill-tabs-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(34 225 255 / 0.35) transparent;
+}

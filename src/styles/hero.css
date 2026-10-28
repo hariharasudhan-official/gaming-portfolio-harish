@@ -1,0 +1,242 @@
+/* ============================================================================
+   Chapter 01 (Awakening) + Chapter 02 (Enter the Portal)
+   All scroll-linked values arrive as CSS custom properties written by
+   useScrollVar — no React re-renders per frame.
+   ========================================================================== */
+
+/* --- Chapter 01 -------------------------------------------------------------- */
+
+/* Title block drifts up and dissolves as chapter 01 progresses (--p: 0..1). */
+.awk-drift {
+  --p: 0;
+  opacity: calc(1 - var(--p) * 1.55);
+  transform: translate3d(0, calc(var(--p) * -9vh), 0);
+  will-change: transform, opacity;
+}
+
+/* Scroll cue disappears almost immediately once the visitor starts moving. */
+.awk-cue {
+  --p: 0;
+  opacity: calc(1 - var(--p) * 7);
+}
+
+/* Boot log lines "type" in. */
+.awk-boot-line {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  animation: awk-type 0.7s steps(28, end) forwards;
+}
+@keyframes awk-type {
+  to {
+    width: 100%;
+  }
+}
+
+/* Vertical "pulse travelling down a wire" scroll cue. */
+.awk-cue-line {
+  position: relative;
+  width: 1px;
+  height: 56px;
+  overflow: hidden;
+  background: rgb(34 225 255 / 0.18);
+}
+.awk-cue-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -40%;
+  width: 1px;
+  height: 40%;
+  background: linear-gradient(180deg, transparent, #22e1ff);
+  box-shadow: 0 0 8px #22e1ff;
+  animation: awk-wire 1.9s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes awk-wire {
+  to {
+    top: 100%;
+  }
+}
+
+/* One-shot horizontal scan beam that "draws" the world on load. */
+.awk-beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgb(34 225 255 / 0.85) 30%, rgb(143 240 255 / 0.95) 50%, rgb(34 225 255 / 0.85) 70%, transparent);
+  box-shadow:
+    0 0 24px 4px rgb(34 225 255 / 0.35),
+    0 0 80px 18px rgb(59 130 255 / 0.12);
+  opacity: 0;
+  animation: awk-beam 2.4s cubic-bezier(0.45, 0, 0.2, 1) 0.35s forwards;
+  pointer-events: none;
+}
+@keyframes awk-beam {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  10% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100lvh);
+  }
+}
+
+/* Bottom + left readability scrim for the hero copy. */
+.awk-scrim {
+  background:
+    linear-gradient(0deg, rgb(3 4 6 / 0.88), rgb(3 4 6 / 0.35) 38%, transparent 62%),
+    linear-gradient(90deg, rgb(3 4 6 / 0.55), transparent 55%);
+}
+
+/* --- Chapter 02 -------------------------------------------------------------- */
+
+/* Stage fades as the portal hands over to chapter 03 (--p: 0..1).
+   Large screens only — below lg the stage scrolls in normal flow. */
+.ptl-stage {
+  --p: 0;
+}
+@media (min-width: 1024px) {
+  .ptl-stage {
+    opacity: clamp(0, calc(1.75 - var(--p) * 2.1), 1);
+  }
+}
+
+/* Gentle hover-in-space motion for the identity panel. */
+.ptl-float {
+  animation: ptl-float 7s ease-in-out infinite;
+}
+@keyframes ptl-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+/* Scan line sweeping down the identity panel. */
+.ptl-scan {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ptl-scan::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -30%;
+  height: 30%;
+  background: linear-gradient(180deg, transparent, rgb(34 225 255 / 0.07) 70%, rgb(143 240 255 / 0.45) 99%, transparent);
+  animation: ptl-scan 4.8s linear infinite;
+}
+@keyframes ptl-scan {
+  0% {
+    top: -30%;
+  }
+  70%,
+  100% {
+    top: 110%;
+  }
+}
+
+/* Rotating reticle in the player emblem. */
+.ptl-spin {
+  transform-origin: 50% 50%;
+  animation: ptl-spin 18s linear infinite;
+}
+.ptl-spin-rev {
+  transform-origin: 50% 50%;
+  animation: ptl-spin 26s linear infinite reverse;
+}
+@keyframes ptl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ptl-scrim {
+  background: linear-gradient(90deg, rgb(3 4 6 / 0.8), rgb(3 4 6 / 0.4) 35%, transparent 55%, transparent 62%, rgb(3 4 6 / 0.5));
+}
+@media (max-width: 767px) {
+  .ptl-scrim {
+    background: linear-gradient(180deg, rgb(3 4 6 / 0.55), rgb(3 4 6 / 0.75));
+  }
+}
+
+/* Short desktop viewports (sticky lg+ stage): the stage reserves 96px top
+   (fixed HUD bar + MENU) and 64px bottom, so the identity card goes compact
+   to fit the remaining height without riding up under the HUD.
+   Plain (unlayered) CSS, so these win over the Tailwind utilities. */
+@media (min-width: 1024px) and (max-height: 860px) {
+  .ptl-card {
+    padding: 1.125rem 1.375rem;
+  }
+  .ptl-card header {
+    gap: 1rem;
+  }
+  .ptl-emblem {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+  .ptl-emblem > span {
+    font-size: 1rem;
+  }
+  .ptl-divider {
+    margin-block: 0.75rem;
+  }
+  .ptl-stats > :not(:last-child) {
+    margin-block: 0 0.375rem;
+  }
+  .ptl-stat {
+    padding-bottom: 0.375rem;
+  }
+  .ptl-stat-value {
+    font-size: 0.875rem;
+  }
+  .ptl-loadout {
+    margin-top: 0.875rem;
+  }
+  .ptl-chips {
+    margin-top: 0.5rem;
+    gap: 0.375rem;
+  }
+  .ptl-cta {
+    margin-top: 0.875rem;
+    min-height: 44px;
+    padding-block: 0.5rem;
+  }
+}
+
+/* --- Reduced motion: remove decorative loops outright ----------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .awk-drift {
+    transform: none;
+  }
+  .awk-boot-line {
+    width: 100%;
+    animation: none;
+  }
+  .awk-beam,
+  .awk-cue-line::after,
+  .ptl-scan {
+    display: none;
+  }
+  .ptl-float,
+  .ptl-spin,
+  .ptl-spin-rev {
+    animation: none;
+  }
+}

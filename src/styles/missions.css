@@ -1,0 +1,226 @@
+/* ============================================================================
+   Chapter 03 — The Digital City: mission-select stage + mission panels.
+   Literal colour values mirror the @theme tokens in index.css.
+   ========================================================================== */
+
+@property --mission-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* --- Stage ------------------------------------------------------------------
+   Flow layout by default (mobile / short screens). On wide + tall screens the
+   stage pins to the viewport while the city clip scrubs behind it. */
+.city-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) and (min-height: 760px) {
+  .city-stage {
+    position: sticky;
+    top: 0;
+    height: 100lvh;
+    justify-content: space-between;
+  }
+}
+
+/* Scroll-linked drift for the headline block (--p = chapter progress 0..1). */
+.city-drift {
+  transform: translate3d(0, calc(var(--p, 0) * -36px), 0);
+  will-change: transform;
+}
+.city-scan-fill {
+  transform: scaleX(var(--p, 0));
+  transform-origin: 0 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .city-drift {
+    transform: none;
+  }
+}
+
+/* --- Mission panel --------------------------------------------------------- */
+.mission {
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 50%;
+  --my: 50%;
+  --cut: 18px;
+  position: relative;
+  height: 100%;
+  transform: perspective(1100px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mission[data-tilting='true'] {
+  transition: transform 0.12s linear;
+}
+
+/* Soft outer glow (sibling of the clipped frame so it is not clipped). */
+.mission-glow {
+  position: absolute;
+  inset: 6%;
+  background: radial-gradient(ellipse at 50% 60%, rgb(34 225 255 / 0.55), rgb(59 130 255 / 0.25) 55%, transparent 75%);
+  filter: blur(28px);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+
+.mission-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background:
+    linear-gradient(180deg, rgb(18 26 35 / 0.78), rgb(6 9 13 / 0.88)),
+    radial-gradient(120% 70% at 0% 0%, rgb(34 225 255 / 0.08), transparent 60%);
+  clip-path: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+
+/* Animated border: a conic sweep masked to a 1px ring, following the chamfer. */
+.mission-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--mission-angle),
+    rgb(34 225 255 / 0.55),
+    rgb(34 225 255 / 0.1) 22%,
+    rgb(59 130 255 / 0.12) 50%,
+    rgb(255 176 46 / 0.45) 72%,
+    rgb(34 225 255 / 0.55)
+  );
+  clip-path: inherit;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.75;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+/* Pointer-following glare. */
+.mission-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(360px circle at var(--mx) var(--my), rgb(143 240 255 / 0.1), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+/* Corner brackets that expand when the mission is selected. */
+.mission-bracket {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: rgb(34 225 255 / 0.7);
+  pointer-events: none;
+  transition:
+    width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease;
+}
+
+.mission-selected-label {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+.mission-standby-label {
+  transition: opacity 0.3s ease;
+}
+
+/* --- Selected state (hover or keyboard focus inside) ----------------------- */
+.mission:hover .mission-glow,
+.mission:focus-within .mission-glow {
+  opacity: 0.32;
+}
+.mission:hover .mission-frame::before,
+.mission:focus-within .mission-frame::before {
+  opacity: 1;
+  animation: mission-sweep 3.2s linear infinite;
+  background: conic-gradient(
+    from var(--mission-angle),
+    rgb(143 240 255 / 1),
+    rgb(34 225 255 / 0.35) 18%,
+    rgb(59 130 255 / 0.3) 45%,
+    rgb(255 176 46 / 0.85) 70%,
+    rgb(143 240 255 / 1)
+  );
+}
+.mission:hover .mission-frame::after,
+.mission:focus-within .mission-frame::after {
+  opacity: 1;
+}
+.mission:hover .mission-bracket,
+.mission:focus-within .mission-bracket {
+  width: 28px;
+  height: 28px;
+  border-color: rgb(143 240 255 / 1);
+}
+.mission:hover .mission-selected-label,
+.mission:focus-within .mission-selected-label {
+  opacity: 1;
+  transform: none;
+}
+.mission:hover .mission-standby-label,
+.mission:focus-within .mission-standby-label {
+  opacity: 0;
+}
+.mission:hover .mission-title,
+.mission:focus-within .mission-title {
+  color: #fff;
+  text-shadow:
+    0 0 18px rgb(34 225 255 / 0.45),
+    0 0 2px rgb(143 240 255 / 0.6);
+}
+
+@keyframes mission-sweep {
+  to {
+    --mission-angle: 360deg;
+  }
+}
+
+/* Non-clickable preview badge. */
+.mission-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0.6rem 1rem;
+  font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8fa6b3;
+  border: 1px dashed rgb(143 166 179 / 0.4);
+  background: rgb(143 166 179 / 0.05);
+  cursor: default;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mission {
+    transform: none !important;
+  }
+}
